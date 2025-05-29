@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ImgUpload {% endblock %}</title>
+    <link rel="icon" href="/static/img/webpage_icon.ico" type="image/x-icon">
+</head>
+<body>
+
+    {% block content %}
+    <h1>Upload Images in Batch and Fine-Tune them</h1>
+
+    <form action="{{ url_for('uploaded') }}" method="post" enctype="multipart/form-data">
+        
+        <label for="folder">
+            <span>
+                <p>Browse your Folder</p>
+            </span>
+        </label>
+
+        <input type="file" id="folder" name="folder" webkitdirectory directory multiple accept="image/*" style="display:none;">
+
+        <button type="submit">Upload</button>
+    </form>
+
+    {% endblock %}
+ 
+</body>
+</html>

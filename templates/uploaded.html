@@ -1,0 +1,33 @@
+{% extends "home.html" %}
+
+
+{% block title %}ImgUpload {% endblock %}
+
+{% block content %}
+
+<table>
+
+    <tr>
+        <th>FileName</th>
+        <th>FileSize</th>
+        <th>Preview</th>
+
+    </tr>
+
+    {% for file in folder_files %}
+    <tr>
+        <td>
+            <img src="{{ url_for('static', filename='uploads/' + file.filename) }}" alt="{{ file.filename }}" 
+            style="max-width:100px; max-height:100px;">
+        </td>
+        <td>{{ file.filename }}</td>
+        <td>{{ file.content_length }}</td>
+
+    </tr>
+    {% endfor %}
+
+</table>
+{% endblock %}
+
+
+
