@@ -1,4 +1,4 @@
 import os 
+from dotenv import load_dotenv
+load_dotenv()
 
-related_path = os.path.join('a','/b','c')
-print(related_path)  # This will not work as expected, it will raise an error

@@ -32,4 +32,4 @@ def uploaded():
         return render_template('uploaded.html', folder_files=folder_files)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0',port=5000)
