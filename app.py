@@ -1,5 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
-from werkzeug.utils import secure_filename
+from flask import Flask, render_template, request, url_for
 import os
 
 app = Flask(__name__,template_folder='templates', static_folder='static',static_url_path='/static')
@@ -15,24 +14,30 @@ def home():
         return render_template('home.html')
 
 @app.route('/uploaded', methods=['GET', 'POST'])
-def uploaded():
+def upload():
     if request.method == 'POST':
         folder_files = request.files.getlist('folder')
         if not folder_files or all(f.filename == '' for f in folder_files):
-            return "No folder part in the request"
+            return "No files selected for Uploading"
 
         for file in folder_files:
             if file and allowed_file(file.filename):
                 print(f"Processing file: {file.filename}")
                 upload_folder = os.path.join(app.static_folder, 'uploads')
                 os.makedirs(upload_folder, exist_ok=True)
-                filename = secure_filename(file.filename)
+                filename =os.path.basename(file.filename)
                 file.save(os.path.join(upload_folder, filename))
-                
+
         return render_template('uploaded.html', folder_files=folder_files)
+
+@app.template_filter('trim')
+def trim(s):
+    trimmed_string = os.path.basename(s)
+    print(trimmed_string)
+    return trimmed_string
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0',port=5000)
+    uploads_path = os.path.join(app.static_folder, 'uploads')
+    os.makedirs(uploads_path, exist_ok=True)
 
-
-#HI I am jishnu

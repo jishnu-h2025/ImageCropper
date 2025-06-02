@@ -1,33 +1,27 @@
 {% extends "home.html" %}
 
 
-{% block title %}ImgUpload {% endblock %}
-
 {% block content %}
 
-<table>
+    <table border="1" style="width:50%; border-collapse: collapse;">
 
     <tr>
-        <th>FileName</th>
-        <th>FileSize</th>
-        <th>Preview</th>
-
+        <th>File Name</th>
+        <th>File Type</th>
+        <th>Preview</th>  
     </tr>
 
     {% for file in folder_files %}
     <tr>
+        <td>{{ file.filename | trim}}</td>
+        <td>{{ file.mimetype }}</td>
         <td>
-            <img src="{{ url_for('static', filename='uploads/' + file.filename) }}" alt="{{ file.filename }}" 
+            <img src="{{ url_for('static', filename='uploads/' ~ file.filename|trim ) }}" alt="{{ file.filename | trim }}"
             style="max-width:100px; max-height:100px;">
         </td>
-        <td>{{ file.filename }}</td>
-        <td>{{ file.content_length }}</td>
-
     </tr>
+    
     {% endfor %}
 
-</table>
-{% endblock %}
-
-
+{%endblock %}
 
