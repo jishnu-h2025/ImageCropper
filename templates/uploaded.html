@@ -1,27 +1,271 @@
 {% extends "home.html" %}
 
-
 {% block content %}
 
-    <table border="1" style="width:50%; border-collapse: collapse;">
-
-    <tr>
-        <th>File Name</th>
-        <th>File Type</th>
-        <th>Preview</th>  
-    </tr>
-
-    {% for file in folder_files %}
-    <tr>
-        <td>{{ file.filename | trim}}</td>
-        <td>{{ file.mimetype }}</td>
-        <td>
-            <img src="{{ url_for('static', filename='uploads/' ~ file.filename|trim ) }}" alt="{{ file.filename | trim }}"
-            style="max-width:100px; max-height:100px;">
-        </td>
-    </tr>
+<style>
+    /* Hover Effects */
+    .hover-effect {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .hover-effect:hover {
+        transform: scale(1.03);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
     
-    {% endfor %}
+    /* Image Thumbnails */
+    .image-thumbnail {
+        position: relative;
+        border-radius: 5px;
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+    }
+    .image-thumbnail.small {
+        height: 100px;
+    }
+    .image-thumbnail.large {
+        height: 200px;
+    }
+    .image-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 5px;
+        text-align: center;
+        font-size: 0.8rem;
+    }
+    
+    /* List View */
+    .list-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    .list-thumb {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        margin-right: 15px;
+    }
+    .list-details {
+        display: flex;
+        flex-direction: column;
+    }
+    .list-filename {
+        font-weight: 500;
+    }
+    .list-mimetype {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
 
-{%endblock %}
 
+<div class="container">
+    <!-- Header and View Options -->
+    <div class="d-flex justify-content-between align-items-center my-4">
+        <h2>Uploaded Images</h2>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-secondary view-option active" data-view="small">
+                <i class="bi bi-grid-fill"></i> Small
+            </button>
+            <button type="button" class="btn btn-outline-secondary view-option" data-view="large">
+                <i class="bi bi-grid-3x3-gap-fill"></i> Large
+            </button>
+            <button type="button" class="btn btn-outline-secondary view-option" data-view="list">
+                <i class="bi bi-list-ul"></i> List
+            </button>
+        </div>
+    </div>
+
+    <!-- Image Gallery Section - Dynamic Views -->
+    <div id="imageGallery">
+        <!-- Small Icons View (Default) -->
+        <div class="row view-content" id="small-view">
+            {% for file in folder_files %}
+                {% if file.filename.lower() != 'desktop.ini' and file.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif'] %}
+                <div class="col-3 col-md-2 mb-3">
+                    <div class="image-thumbnail small hover-effect"
+                         data-src="{{ url_for('static', filename='uploads/' + file.filename) }}">
+                        <img src="{{ url_for('static', filename='uploads/' + file.filename) }}"
+                             class="img-fluid"
+                             alt="{{ file.filename }}">
+                        <div class="image-overlay">
+                            <span>{{ file.filename|truncate(15, True) }}</span>  <!-- Fixed typo here -->
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Large Icons View -->
+        <div class="row view-content d-none" id="large-view">
+            {% for file in folder_files %}
+                {% if file.filename.lower() != 'desktop.ini' and file.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif'] %}
+                <div class="col-6 col-md-4 col-lg-3 mb-4">
+                    <div class="image-thumbnail large hover-effect"
+                         data-src="{{ url_for('static', filename='uploads/' + file.filename) }}">
+                        <img src="{{ url_for('static', filename='uploads/' + file.filename) }}"
+                             class="img-fluid"
+                             alt="{{ file.filename }}">
+                        <div class="image-overlay">
+                            <span>{{ file.filename|truncate(20, True) }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- List View -->
+        <div class="list-view view-content d-none" id="list-view">
+            {% for file in folder_files %}
+                {% if file.filename.lower() != 'desktop.ini' and file.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif'] %}
+                <div class="list-item hover-effect"
+                     data-src="{{ url_for('static', filename='uploads/' + file.filename) }}">
+                    <img src="{{ url_for('static', filename='uploads/' + file.filename) }}"
+                         class="list-thumb"
+                         alt="{{ file.filename }}">
+                    <div class="list-details">
+                        <span class="list-filename">{{ file.filename }}</span>
+                        <span class="list-mimetype">{{ file.filename.split('.')[-1].upper() }} file</span>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Cropper Modal -->
+<div class="modal fade" id="imageCropperModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Crop Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="img-container">
+                    <img id="cropperImage" src="" class="img-fluid" style="max-height: 70vh;">
+                </div>
+                <div class="mt-3">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary" id="cropAuto">Auto Crop</button>
+                        <button type="button" class="btn btn-outline-primary" id="cropCustom">Custom Crop</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCrop">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+{{ super() }}
+<!-- Include Cropper.js -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // View Options Toggle
+    const viewOptions = document.querySelectorAll('.view-option');
+    viewOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            viewOptions.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            document.querySelectorAll('.view-content').forEach(view => {
+                view.classList.add('d-none');
+            });
+            
+            const viewId = this.getAttribute('data-view') + '-view';
+            document.getElementById(viewId).classList.remove('d-none');
+        });
+    });
+    
+    // Initialize Cropper
+    let cropper;
+    const image = document.getElementById('cropperImage');
+    
+    // Click handlers for all image elements
+    document.querySelectorAll('.hover-effect').forEach(element => {
+        element.addEventListener('click', function() {
+            const imageSrc = this.getAttribute('data-src') || 
+                            this.querySelector('img').getAttribute('src');
+            document.getElementById('cropperImage').src = imageSrc;
+            const modal = new bootstrap.Modal(document.getElementById('imageCropperModal'));
+            modal.show();
+            
+            if (cropper) {
+                cropper.destroy();
+            }
+        });
+    });
+    
+    // Modal shown event
+    document.getElementById('imageCropperModal').addEventListener('shown.bs.modal', function() {
+        document.getElementById('cropAuto').classList.remove('active');
+        document.getElementById('cropCustom').classList.remove('active');
+        
+        document.getElementById('cropCustom').addEventListener('click', function() {
+            this.classList.add('active');
+            document.getElementById('cropAuto').classList.remove('active');
+            
+            cropper = new Cropper(image, {
+                aspectRatio: 1,
+                viewMode: 1,
+                autoCropArea: 0.8,
+                responsive: true,
+                guides: true
+            });
+        });
+        
+        document.getElementById('cropAuto').addEventListener('click', function() {
+            this.classList.add('active');
+            document.getElementById('cropCustom').classList.remove('active');
+            
+            if (cropper) {
+                cropper.destroy();
+            }
+        });
+    });
+    
+    // Save Crop handler
+    document.getElementById('saveCrop').addEventListener('click', function() {
+        let croppedImage;
+        
+        if (document.getElementById('cropCustom').classList.contains('active') && cropper) {
+            croppedImage = cropper.getCroppedCanvas().toDataURL('image/jpeg');
+        } else {
+            croppedImage = image.src;
+        }
+        
+        // Here you would send the croppedImage to your server
+        console.log('Cropped image data:', croppedImage);
+        alert('Crop saved (check console for data)');
+        
+        bootstrap.Modal.getInstance(document.getElementById('imageCropperModal')).hide();
+    });
+    
+    // Clean up cropper when modal closes
+    document.getElementById('imageCropperModal').addEventListener('hidden.bs.modal', function() {
+        if (cropper) {
+            cropper.destroy();
+        }
+    });
+});
+</script>
+{% endblock %}
