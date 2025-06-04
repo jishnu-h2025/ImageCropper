@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, url_for, send_from_directory
-import os
+import os,datetime
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__, template_folder='templates', static_folder='static', static_url_path='/static')
@@ -30,25 +30,38 @@ def upload():
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                uploaded_files.append({'filename': filename})
-        
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)
+                # Get file size and modified time for gallery display
+                file_stat = os.stat(file_path)
+                uploaded_files.append({
+                    'filename': filename,
+                    'filesize': file_stat.st_size,
+                    'modified': file_stat.st_mtime
+                })
+        # Convert modified time to datetime for template
+        for f in uploaded_files:
+            f['modified'] = datetime.datetime.fromtimestamp(f['modified'])
         return render_template('uploaded.html', folder_files=uploaded_files)
     
     # For GET requests, show the upload form
-    return render_template('uploaded.html')
+    return render_template('uploaded.html', folder_files=[])
 
 @app.route('/images')
 def images():
     # Get list of files in upload directory
     folder_files = []
     upload_path = app.config['UPLOAD_FOLDER']
-    
     if os.path.exists(upload_path):
         for filename in os.listdir(upload_path):
             filepath = os.path.join(upload_path, filename)
             if os.path.isfile(filepath) and allowed_file(filename):
-                folder_files.append({'filename': filename})
+                file_stat = os.stat(filepath)
+                folder_files.append({
+                    'filename': filename,
+                    'filesize': file_stat.st_size,
+                    'modified': datetime.datetime.fromtimestamp(file_stat.st_mtime)
+                })
     
     return render_template('images.html', folder_files=folder_files)
 
