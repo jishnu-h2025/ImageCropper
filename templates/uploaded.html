@@ -1,31 +1,85 @@
 {% extends "home.html" %}
 
-{% block content %}
-
+{% block styles %}
+{{ super() }}
 <style>
-    /* Hover Effects */
-    .hover-effect {
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    .hover-effect:hover {
-        transform: scale(1.03);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    /* Gallery Styles */
+    .gallery-container {
+        padding: 20px;
     }
     
-    /* Image Thumbnails */
+    .view-options {
+        margin-bottom: 20px;
+    }
+    
+    /* Thumbnail Styles */
     .image-thumbnail {
         position: relative;
-        border-radius: 5px;
+        border-radius: 8px;
         overflow: hidden;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background-color: #f8f9fa;
         border: 1px solid #dee2e6;
     }
-    .image-thumbnail.small {
-        height: 100px;
+    
+    .image-thumbnail:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     }
-    .image-thumbnail.large {
+    
+    .image-thumbnail img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    /* Different view sizes */
+    .small {
+        height: 120px;
+    }
+    
+    .large {
         height: 200px;
     }
+    
+    .list-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .list-item:hover {
+        background-color: #e9ecef;
+    }
+    
+    .list-thumb {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 4px;
+        margin-right: 15px;
+    }
+    
+    .list-details {
+        flex-grow: 1;
+    }
+    
+    .list-filename {
+        display: block;
+        font-weight: 500;
+    }
+    
+    .list-mimetype {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    /* Overlay effects */
     .image-overlay {
         position: absolute;
         bottom: 0;
@@ -33,69 +87,70 @@
         right: 0;
         background: rgba(0,0,0,0.7);
         color: white;
-        padding: 5px;
-        text-align: center;
+        padding: 8px;
         font-size: 0.8rem;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
     }
     
-    /* List View */
-    .list-item {
-        display: flex;
-        align-items: center;
-        padding: 10px;
-        border-bottom: 1px solid #eee;
+    .image-thumbnail:hover .image-overlay {
+        opacity: 1;
     }
-    .list-thumb {
-        width: 50px;
-        height: 50px;
-        object-fit: cover;
-        margin-right: 15px;
+    
+    /* Cropper Modal Styles */
+    .cropper-modal {
+        max-width: 90vw;
     }
-    .list-details {
-        display: flex;
-        flex-direction: column;
+    
+    .cropper-container {
+        max-height: 70vh;
     }
-    .list-filename {
-        font-weight: 500;
+    
+    .cropper-buttons {
+        margin-top: 20px;
     }
-    .list-mimetype {
-        font-size: 0.8rem;
-        color: #6c757d;
+    
+    /* Download button */
+    .download-btn {
+        margin-top: 10px;
     }
 </style>
+{% endblock %}
 
-
-<div class="container">
+{% block content %}
+<div class="gallery-container">
     <!-- Header and View Options -->
     <div class="d-flex justify-content-between align-items-center my-4">
-        <h2>Uploaded Images</h2>
-        <div class="btn-group" role="group">
-            <button type="button" class="btn btn-outline-secondary view-option active" data-view="small">
-                <i class="bi bi-grid-fill"></i> Small
+        <h2>Image Gallery</h2>
+        <div class="btn-group view-options" role="group">
+            <button type="button" class="btn btn-outline-primary view-option active" data-view="small">
+                <i class="bi bi-grid-fill"></i> Grid
             </button>
-            <button type="button" class="btn btn-outline-secondary view-option" data-view="large">
-                <i class="bi bi-grid-3x3-gap-fill"></i> Large
+            <button type="button" class="btn btn-outline-primary view-option" data-view="large">
+                <i class="bi bi-image-fill"></i> Large
             </button>
-            <button type="button" class="btn btn-outline-secondary view-option" data-view="list">
+            <button type="button" class="btn btn-outline-primary view-option" data-view="list">
                 <i class="bi bi-list-ul"></i> List
             </button>
         </div>
     </div>
 
-    <!-- Image Gallery Section - Dynamic Views -->
+    <!-- Image Gallery Section -->
     <div id="imageGallery">
-        <!-- Small Icons View (Default) -->
+        <!-- Grid View (Small) -->
         <div class="row view-content" id="small-view">
             {% for file in folder_files %}
                 {% if file.filename.lower() != 'desktop.ini' and file.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif'] %}
-                <div class="col-3 col-md-2 mb-3">
-                    <div class="image-thumbnail small hover-effect"
+                <div class="col-6 col-md-4 col-lg-3 mb-4">
+                    <div class="image-thumbnail small" 
+                         data-filename="{{ file.filename }}"
                          data-src="{{ url_for('static', filename='uploads/' + file.filename) }}">
-                        <img src="{{ url_for('static', filename='uploads/' + file.filename) }}"
-                             class="img-fluid"
-                             alt="{{ file.filename }}">
+                        <img src="{{ url_for('static', filename='uploads/' + file.filename) }}" 
+                             alt="{{ file.filename }}"
+                             class="img-fluid">
                         <div class="image-overlay">
-                            <span>{{ file.filename|truncate(15, True) }}</span>  <!-- Fixed typo here -->
+                            <span>{{ file.filename|truncate(20, True) }}</span>
                         </div>
                     </div>
                 </div>
@@ -103,16 +158,17 @@
             {% endfor %}
         </div>
 
-        <!-- Large Icons View -->
+        <!-- Large View -->
         <div class="row view-content d-none" id="large-view">
             {% for file in folder_files %}
                 {% if file.filename.lower() != 'desktop.ini' and file.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif'] %}
-                <div class="col-6 col-md-4 col-lg-3 mb-4">
-                    <div class="image-thumbnail large hover-effect"
+                <div class="col-12 col-md-6 col-lg-4 mb-4">
+                    <div class="image-thumbnail large" 
+                         data-filename="{{ file.filename }}"
                          data-src="{{ url_for('static', filename='uploads/' + file.filename) }}">
-                        <img src="{{ url_for('static', filename='uploads/' + file.filename) }}"
-                             class="img-fluid"
-                             alt="{{ file.filename }}">
+                        <img src="{{ url_for('static', filename='uploads/' + file.filename) }}" 
+                             alt="{{ file.filename }}"
+                             class="img-fluid">
                         <div class="image-overlay">
                             <span>{{ file.filename|truncate(20, True) }}</span>
                         </div>
@@ -123,17 +179,18 @@
         </div>
 
         <!-- List View -->
-        <div class="list-view view-content d-none" id="list-view">
+        <div class="view-content d-none" id="list-view">
             {% for file in folder_files %}
                 {% if file.filename.lower() != 'desktop.ini' and file.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif'] %}
-                <div class="list-item hover-effect"
+                <div class="list-item" 
+                     data-filename="{{ file.filename }}"
                      data-src="{{ url_for('static', filename='uploads/' + file.filename) }}">
-                    <img src="{{ url_for('static', filename='uploads/' + file.filename) }}"
+                    <img src="{{ url_for('static', filename='uploads/' + file.filename) }}" 
                          class="list-thumb"
                          alt="{{ file.filename }}">
                     <div class="list-details">
                         <span class="list-filename">{{ file.filename }}</span>
-                        <span class="list-mimetype">{{ file.filename.split('.')[-1].upper() }} file</span>
+                        <span class="list-mimetype">{{ file.filename.split('.')[-1].upper() }} Image</span>
                     </div>
                 </div>
                 {% endif %}
@@ -144,35 +201,44 @@
 
 <!-- Cropper Modal -->
 <div class="modal fade" id="imageCropperModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Crop Image</h5>
+                <h5 class="modal-title">Edit Image</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center">
+            <div class="modal-body">
                 <div class="img-container">
-                    <img id="cropperImage" src="" class="img-fluid" style="max-height: 70vh;">
+                    <img id="cropperImage" src="" class="img-fluid w-100">
                 </div>
-                <div class="mt-3">
+                <div class="cropper-buttons mt-3 text-center">
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-outline-primary" id="cropAuto">Auto Crop</button>
-                        <button type="button" class="btn btn-outline-primary" id="cropCustom">Custom Crop</button>
+                        <button type="button" class="btn btn-outline-primary" id="rotateLeft">
+                            <i class="bi bi-arrow-counterclockwise"></i> Rotate Left
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="rotateRight">
+                            <i class="bi bi-arrow-clockwise"></i> Rotate Right
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="resetCrop">
+                            <i class="bi bi-arrow-counterclockwise"></i> Reset
+                        </button>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveCrop">Save</button>
+                <div class="cropper-actions mt-3 text-center">
+                    <button type="button" class="btn btn-success" id="saveCrop">
+                        <i class="bi bi-check-circle"></i> Apply Changes
+                    </button>
+                    <button type="button" class="btn btn-primary ms-2" id="downloadCrop">
+                        <i class="bi bi-download"></i> Download
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}
-
 {{ super() }}
 <!-- Include Cropper.js -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
@@ -199,65 +265,79 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Cropper
     let cropper;
     const image = document.getElementById('cropperImage');
+    let currentImageSrc = '';
+    let currentFilename = '';
     
     // Click handlers for all image elements
-    document.querySelectorAll('.hover-effect').forEach(element => {
+    document.querySelectorAll('.image-thumbnail, .list-item').forEach(element => {
         element.addEventListener('click', function() {
-            const imageSrc = this.getAttribute('data-src') || 
-                            this.querySelector('img').getAttribute('src');
-            document.getElementById('cropperImage').src = imageSrc;
+            currentImageSrc = this.getAttribute('data-src');
+            currentFilename = this.getAttribute('data-filename');
+            
+            // Set the image source
+            image.src = currentImageSrc;
+            
+            // Show the modal
             const modal = new bootstrap.Modal(document.getElementById('imageCropperModal'));
             modal.show();
-            
-            if (cropper) {
-                cropper.destroy();
-            }
         });
     });
     
-    // Modal shown event
+    // Modal shown event - initialize cropper
     document.getElementById('imageCropperModal').addEventListener('shown.bs.modal', function() {
-        document.getElementById('cropAuto').classList.remove('active');
-        document.getElementById('cropCustom').classList.remove('active');
-        
-        document.getElementById('cropCustom').addEventListener('click', function() {
-            this.classList.add('active');
-            document.getElementById('cropAuto').classList.remove('active');
-            
-            cropper = new Cropper(image, {
-                aspectRatio: 1,
-                viewMode: 1,
-                autoCropArea: 0.8,
-                responsive: true,
-                guides: true
-            });
+        cropper = new Cropper(image, {
+            aspectRatio: NaN, // Free ratio
+            viewMode: 1,
+            autoCropArea: 1,
+            responsive: true,
+            restore: true,
+            checkCrossOrigin: false,
+            guides: true,
+            center: true,
+            highlight: true,
+            cropBoxMovable: true,
+            cropBoxResizable: true
         });
-        
-        document.getElementById('cropAuto').addEventListener('click', function() {
-            this.classList.add('active');
-            document.getElementById('cropCustom').classList.remove('active');
-            
-            if (cropper) {
-                cropper.destroy();
-            }
-        });
+    });
+    
+    // Rotate buttons
+    document.getElementById('rotateLeft').addEventListener('click', function() {
+        cropper.rotate(-90);
+    });
+    
+    document.getElementById('rotateRight').addEventListener('click', function() {
+        cropper.rotate(90);
+    });
+    
+    // Reset button
+    document.getElementById('resetCrop').addEventListener('click', function() {
+        cropper.reset();
     });
     
     // Save Crop handler
     document.getElementById('saveCrop').addEventListener('click', function() {
-        let croppedImage;
+        const croppedCanvas = cropper.getCroppedCanvas();
+        const croppedImage = croppedCanvas.toDataURL('image/jpeg', 0.9);
         
-        if (document.getElementById('cropCustom').classList.contains('active') && cropper) {
-            croppedImage = cropper.getCroppedCanvas().toDataURL('image/jpeg');
-        } else {
-            croppedImage = image.src;
-        }
+        // Here you would typically send the image to your server
+        // For this example, we'll just update the thumbnail
+        updateThumbnail(currentImageSrc, croppedImage);
         
-        // Here you would send the croppedImage to your server
-        console.log('Cropped image data:', croppedImage);
-        alert('Crop saved (check console for data)');
-        
+        // Close the modal
         bootstrap.Modal.getInstance(document.getElementById('imageCropperModal')).hide();
+    });
+    
+    // Download button
+    document.getElementById('downloadCrop').addEventListener('click', function() {
+        const croppedCanvas = cropper.getCroppedCanvas();
+        
+        // Create a temporary link
+        const link = document.createElement('a');
+        link.download = 'cropped_' + currentFilename;
+        link.href = croppedCanvas.toDataURL('image/jpeg', 0.9);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     });
     
     // Clean up cropper when modal closes
@@ -266,6 +346,17 @@ document.addEventListener('DOMContentLoaded', function() {
             cropper.destroy();
         }
     });
+    
+    // Function to update thumbnail after cropping
+    function updateThumbnail(originalSrc, newImageData) {
+        // Find all elements with this image source
+        document.querySelectorAll(`[data-src="${originalSrc}"]`).forEach(element => {
+            const img = element.querySelector('img');
+            if (img) {
+                img.src = newImageData;
+            }
+        });
+    }
 });
 </script>
 {% endblock %}
