@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Expandable Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #e4e4e4e5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .sidebar {
+            height: 100vh;
+            width: 80px;
+            background-color: #ffffff;
+            padding-top: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: fixed;
+            overflow-x: hidden;
+        }
+        .sidebar.expanded {
+            width: 250px;
+        }
+        .menu-toggle {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        .sidebar-item {
+            height: 50px;
+            margin: 5px 10px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        
+        .sidebar-item:hover {
+            background-color: #b9bcc0;
+            color:#ffffff;
+            cursor:pointer;
+
+        }
+        .sidebar-item i {
+            font-size: 1.4rem;
+            color: #287af5; /* Darker blue */
+            margin-right: 20px;
+            width: 24px;
+            text-align: center;
+            font-weight: bold; /* Thicker icons */
+        }
+        .sidebar-item span {
+            font-size: 0.95rem;
+            color: #110101;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .sidebar.expanded .sidebar-item span {
+            opacity: 1;
+        }
+        .sidebar-item.active {
+            background-color: #4d8ff1;
+        }
+
+        .sidebar-item.active i {
+            color: #ffffff;
+        }
+
+        .sidebar-item.active span {
+            font-weight: 500;
+            color: #0a0008;
+        }
+        .main-content {
+            padding: 20px;
+            margin-left: 80px;
+            transition: all 0.3s ease;
+        }
+        .main-content.expanded {
+            margin-left: 250px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="menu-toggle" onclick="toggleSidebar()">
+                <i class="bi bi-list" style="font-size: 1.5rem; color: #0074FF;"></i>
+            </div>
+            <div class="sidebar-item active">
+                <i class="bi bi-house-door"></i>
+                <span>Home</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="bi bi-cart"></i>
+                <span>Orders</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="bi bi-box-seam"></i>
+                <span>Products</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="bi bi-sliders"></i>
+                <span>Customize</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="bi bi-people"></i>
+                <span>Customers</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="bi bi-graph-up"></i>
+                <span>Analytics</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="bi bi-gear"></i>
+                <span>Settings</span>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="main-content" id="main-content">
+
+            {% block dashboard %}
+            <h2>Dashboard Overview</h2>
+            <p>Welcome to your dashboard. Click the menu icon to expand the sidebar.</p>
+            <!-- Your dashboard content goes here -->
+            {% endblock dashboard %}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            sidebar.classList.toggle('expanded');
+            mainContent.classList.toggle('expanded');
+        }
+        
+        // Add click event to menu items
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.sidebar-item').forEach(i => {
+                    i.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

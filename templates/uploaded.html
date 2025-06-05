@@ -1,68 +1,113 @@
 {% extends "home.html" %}
 
 {% block styles %}
+
 {{ super() }}
+
 <style>
-    /* Gallery Styles */
+    /* Modern Gallery Styles */
     .gallery-container {
-        padding: 20px;
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
     }
     
-    .view-options {
-        margin-bottom: 20px;
+    .gallery-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
     }
     
-    /* Thumbnail Styles */
+    .view-options .btn {
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .view-options .btn.active {
+        background-color: #0d6efd;
+        color: white;
+    }
+    /* Enhanced Thumbnail Styles */
     .image-thumbnail {
         position: relative;
-        border-radius: 8px;
+        border-radius: 12px;
         overflow: hidden;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         cursor: pointer;
         background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
     .image-thumbnail:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.15);
     }
     
     .image-thumbnail img {
-        width: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
         height: auto;
+        object-fit: cover;
         display: block;
+        margin: 0 auto;
     }
     
-    /* Different view sizes */
+    /* View Sizes */
     .small {
-        height: 120px;
+        aspect-ratio: 1;
+        height: auto;
     }
     
     .large {
-        height: 200px;
+        aspect-ratio: 4/3;
+        height: auto;
+    }
+    
+    .image-thumbnail.small {
+        width: 180px;
+        height: 180px;
+        margin: 0 auto;
+    }
+    .image-thumbnail.large {
+        width: 320px;
+        height: 240px;
+        margin: 0 auto;
+    }
+    
+    /* List View Enhancements */
+    .list-view {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
     }
     
     .list-item {
         display: flex;
         align-items: center;
-        padding: 10px;
-        margin-bottom: 10px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
+        padding: 1rem;
+        background-color: white;
+        border-radius: 12px;
         transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     
     .list-item:hover {
-        background-color: #e9ecef;
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     
     .list-thumb {
         width: 60px;
         height: 60px;
         object-fit: cover;
-        border-radius: 4px;
-        margin-right: 15px;
+        border-radius: 8px;
+        margin-right: 1.5rem;
     }
     
     .list-details {
@@ -71,86 +116,135 @@
     
     .list-filename {
         display: block;
-        font-weight: 500;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: #212529;
     }
     
     .list-mimetype {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         color: #6c757d;
     }
     
-    /* Overlay effects */
+    /* Overlay Effects */
     .image-overlay {
         position: absolute;
         bottom: 0;
         left: 0;
         right: 0;
-        background: rgba(0,0,0,0.7);
+        background: linear-gradient(transparent, rgba(0,0,0,0.8));
         color: white;
-        padding: 8px;
-        font-size: 0.8rem;
-        text-align: center;
+        padding: 1rem;
+        font-size: 0.9rem;
         opacity: 0;
         transition: opacity 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        height: 40%;
     }
     
     .image-thumbnail:hover .image-overlay {
         opacity: 1;
     }
     
-    /* Cropper Modal Styles */
-    .cropper-modal {
-        max-width: 90vw;
+    /* Enhanced Cropper Modal */
+    .cropper-modal .modal-dialog {
+        max-width: 90%;
+        margin: 1rem auto;
     }
     
     .cropper-container {
         max-height: 70vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     
     .cropper-buttons {
-        margin-top: 20px;
+        margin-top: 1.5rem;
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
     }
     
-    /* Download button */
-    .download-btn {
-        margin-top: 10px;
+    .cropper-actions {
+        margin-top: 1.5rem;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    /* Size Slider */
+    .thumb-size-slider {
+        width: 220px;
+        margin-left: 2rem;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .gallery-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .list-thumb {
+            width: 60px;
+            height: 60px;
+            margin-right: 1rem;
+        }
     }
 </style>
+
 {% endblock %}
 
 {% block content %}
 <div class="gallery-container">
-    <!-- Header and View Options -->
-    <div class="d-flex justify-content-between align-items-center my-4">
-        <h2>Image Gallery</h2>
-        <div class="btn-group view-options" role="group">
-            <button type="button" class="btn btn-outline-primary view-option active" data-view="small">
-                <i class="bi bi-grid-fill"></i> Grid
-            </button>
-            <button type="button" class="btn btn-outline-primary view-option" data-view="large">
-                <i class="bi bi-image-fill"></i> Large
-            </button>
-            <button type="button" class="btn btn-outline-primary view-option" data-view="list">
-                <i class="bi bi-list-ul"></i> List
-            </button>
+    <!-- Enhanced Header with Search -->
+    <div class="gallery-header">
+        <h2 class="mb-0">Image Gallery</h2>
+        <div class="d-flex align-items-center gap-3">
+            <div class="input-group" style="max-width: 300px;">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" placeholder="Search images..." id="searchImages">
+            </div>
+            <div class="btn-group view-options" role="group">
+                <button type="button" class="btn btn-outline-primary view-option active" data-view="small" title="Grid View">
+                    <i class="bi bi-grid-fill"></i>
+                </button>
+                <button type="button" class="btn btn-outline-primary view-option" data-view="large" title="Large Grid">
+                    <i class="bi bi-image-fill"></i>
+                </button>
+                <button type="button" class="btn btn-outline-primary view-option" data-view="list" title="List View">
+                    <i class="bi bi-list-ul"></i>
+                </button>
+            </div>
+            <div class="d-flex align-items-center ms-3">
+                <label for="thumbSizeSlider" class="form-label mb-0 me-2">Thumbnail Size</label>
+                <input type="range" min="80" max="320" value="180" step="10" id="thumbSizeSlider" class="thumb-size-slider">
+            </div>
         </div>
     </div>
 
     <!-- Image Gallery Section -->
     <div id="imageGallery">
         <!-- Grid View (Small) -->
-        <div class="row view-content" id="small-view">
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3 view-content" id="small-view">
             {% for file in folder_files %}
-                {% if file.filename.lower() != 'desktop.ini' and file.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif'] %}
-                <div class="col-6 col-md-4 col-lg-3 mb-4">
+                {% if file.filename.lower() != 'desktop.ini' and file.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif', 'webp'] %}
+                <div class="col">
                     <div class="image-thumbnail small" 
                          data-filename="{{ file.filename }}"
-                         data-src="{{ url_for('static', filename='uploads/' + file.filename) }}">
+                         data-src="{{ url_for('static', filename='uploads/' + file.filename) }}"
+                         data-search="{{ file.filename.lower() }}">
                         <img src="{{ url_for('static', filename='uploads/' + file.filename) }}" 
                              alt="{{ file.filename }}"
-                             class="img-fluid">
+                             loading="lazy">
                         <div class="image-overlay">
                             <span>{{ file.filename|truncate(20, True) }}</span>
+                            <small>{{ (file.filesize / 1024)|round(1) }} KB</small>
                         </div>
                     </div>
                 </div>
@@ -159,18 +253,20 @@
         </div>
 
         <!-- Large View -->
-        <div class="row view-content d-none" id="large-view">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 view-content d-none" id="large-view">
             {% for file in folder_files %}
-                {% if file.filename.lower() != 'desktop.ini' and file.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif'] %}
-                <div class="col-12 col-md-6 col-lg-4 mb-4">
+                {% if file.filename.lower() != 'desktop.ini' and file.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif', 'webp'] %}
+                <div class="col">
                     <div class="image-thumbnail large" 
                          data-filename="{{ file.filename }}"
-                         data-src="{{ url_for('static', filename='uploads/' + file.filename) }}">
+                         data-src="{{ url_for('static', filename='uploads/' + file.filename) }}"
+                         data-search="{{ file.filename.lower() }}">
                         <img src="{{ url_for('static', filename='uploads/' + file.filename) }}" 
                              alt="{{ file.filename }}"
-                             class="img-fluid">
+                             loading="lazy">
                         <div class="image-overlay">
-                            <span>{{ file.filename|truncate(20, True) }}</span>
+                            <span>{{ file.filename|truncate(25, True) }}</span>
+                            <small>{{ file.filename.split('.')[-1].upper() }} • {{ (file.filesize / 1024)|round(1) }} KB</small>
                         </div>
                     </div>
                 </div>
@@ -179,57 +275,100 @@
         </div>
 
         <!-- List View -->
-        <div class="view-content d-none" id="list-view">
+        <div class="list-view view-content d-none" id="list-view">
             {% for file in folder_files %}
-                {% if file.filename.lower() != 'desktop.ini' and file.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif'] %}
+                {% if file.filename.lower() != 'desktop.ini' and file.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif', 'webp'] %}
                 <div class="list-item" 
                      data-filename="{{ file.filename }}"
-                     data-src="{{ url_for('static', filename='uploads/' + file.filename) }}">
+                     data-src="{{ url_for('static', filename='uploads/' + file.filename) }}"
+                     data-search="{{ file.filename.lower() }}">
                     <img src="{{ url_for('static', filename='uploads/' + file.filename) }}" 
                          class="list-thumb"
-                         alt="{{ file.filename }}">
+                         alt="{{ file.filename }}"
+                         loading="lazy">
                     <div class="list-details">
                         <span class="list-filename">{{ file.filename }}</span>
-                        <span class="list-mimetype">{{ file.filename.split('.')[-1].upper() }} Image</span>
+                        <span class="list-mimetype">{{ file.filename.split('.')[-1].upper() }} • {{ (file.filesize / 1024)|round(1) }} KB • {{ file.modified.strftime('%Y-%m-%d %H:%M') if file.modified else '' }}</span>
                     </div>
+                    <button class="btn btn-sm btn-outline-secondary ms-auto">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
                 </div>
                 {% endif %}
             {% endfor %}
         </div>
     </div>
+
+    <!-- Empty State -->
+    <div class="text-center py-5 d-none" id="emptyState">
+        <i class="bi bi-images" style="font-size: 3rem; color: #6c757d;"></i>
+        <h4 class="mt-3">No images found</h4>
+        <p class="text-muted">Try adjusting your search or upload new images</p>
+    </div>
 </div>
 
-<!-- Cropper Modal -->
+<!-- Enhanced Cropper Modal -->
 <div class="modal fade" id="imageCropperModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Edit Image</h5>
+                <h5 class="modal-title">Edit Image: <span id="modalFilename"></span></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="img-container">
-                    <img id="cropperImage" src="" class="img-fluid w-100">
+                    <img id="cropperImage" src="" class="img-fluid w-100" style="max-height: 60vh;">
+                </div>
+                <div class="cropper-controls mt-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Aspect Ratio</label>
+                            <select class="form-select" id="aspectRatio">
+                                <option value="NaN">Free</option>
+                                <option value="1">Square (1:1)</option>
+                                <option value="4/3">Standard (4:3)</option>
+                                <option value="16/9">Widescreen (16:9)</option>
+                                <option value="3/2">Photo (3:2)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Quality</label>
+                            <input type="range" class="form-range" id="qualityRange" min="0.5" max="1" step="0.1" value="0.9">
+                            <div class="d-flex justify-content-between">
+                                <small>Low</small>
+                                <small>High</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="cropper-buttons mt-3 text-center">
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-outline-primary" id="rotateLeft">
-                            <i class="bi bi-arrow-counterclockwise"></i> Rotate Left
+                        <button type="button" class="btn btn-outline-primary" id="rotateLeft" title="Rotate Left">
+                            <i class="bi bi-arrow-counterclockwise"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-primary" id="rotateRight">
-                            <i class="bi bi-arrow-clockwise"></i> Rotate Right
+                        <button type="button" class="btn btn-outline-primary" id="rotateRight" title="Rotate Right">
+                            <i class="bi bi-arrow-clockwise"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-primary" id="resetCrop">
-                            <i class="bi bi-arrow-counterclockwise"></i> Reset
+                        <button type="button" class="btn btn-outline-primary" id="flipHorizontal" title="Flip Horizontal">
+                            <i class="bi bi-arrow-left-right"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="flipVertical" title="Flip Vertical">
+                            <i class="bi bi-arrow-up-down"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" id="resetCrop" title="Reset">
+                            <i class="bi bi-arrow-counterclockwise"></i>
                         </button>
                     </div>
                 </div>
-                <div class="cropper-actions mt-3 text-center">
-                    <button type="button" class="btn btn-success" id="saveCrop">
-                        <i class="bi bi-check-circle"></i> Apply Changes
+                <div class="cropper-actions mt-4 text-center">
+                    <button type="button" class="btn btn-success px-4" id="saveCrop">
+                        <i class="bi bi-check-circle"></i> Save Changes
                     </button>
-                    <button type="button" class="btn btn-primary ms-2" id="downloadCrop">
+                    <button type="button" class="btn btn-primary px-4 ms-2" id="downloadCrop">
                         <i class="bi bi-download"></i> Download
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary px-4 ms-2" data-bs-dismiss="modal">
+                        Cancel
                     </button>
                 </div>
             </div>
@@ -244,7 +383,9 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
+
 <script>
+
 document.addEventListener('DOMContentLoaded', function() {
     // View Options Toggle
     const viewOptions = document.querySelectorAll('.view-option');
@@ -262,11 +403,31 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Initialize Cropper
+    // Image Search Functionality
+    const searchInput = document.getElementById('searchImages');
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        let hasResults = false;
+        
+        document.querySelectorAll('[data-search]').forEach(item => {
+            const filename = item.getAttribute('data-search');
+            if (filename.includes(searchTerm)) {
+                item.closest('.col, .list-item').style.display = '';
+                hasResults = true;
+            } else {
+                item.closest('.col, .list-item').style.display = 'none';
+            }
+        });
+        
+        document.getElementById('emptyState').classList.toggle('d-none', hasResults);
+    });
+    
+    // Initialize Cropper with enhanced features
     let cropper;
     const image = document.getElementById('cropperImage');
     let currentImageSrc = '';
     let currentFilename = '';
+    let currentQuality = 0.9;
     
     // Click handlers for all image elements
     document.querySelectorAll('.image-thumbnail, .list-item').forEach(element => {
@@ -274,8 +435,9 @@ document.addEventListener('DOMContentLoaded', function() {
             currentImageSrc = this.getAttribute('data-src');
             currentFilename = this.getAttribute('data-filename');
             
-            // Set the image source
+            // Set the image source and filename
             image.src = currentImageSrc;
+            document.getElementById('modalFilename').textContent = currentFilename;
             
             // Show the modal
             const modal = new bootstrap.Modal(document.getElementById('imageCropperModal'));
@@ -286,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Modal shown event - initialize cropper
     document.getElementById('imageCropperModal').addEventListener('shown.bs.modal', function() {
         cropper = new Cropper(image, {
-            aspectRatio: NaN, // Free ratio
+            aspectRatio: NaN, // Start with free ratio
             viewMode: 1,
             autoCropArea: 1,
             responsive: true,
@@ -296,11 +458,24 @@ document.addEventListener('DOMContentLoaded', function() {
             center: true,
             highlight: true,
             cropBoxMovable: true,
-            cropBoxResizable: true
+            cropBoxResizable: true,
+            minCanvasWidth: 300,
+            minCanvasHeight: 300
         });
     });
     
-    // Rotate buttons
+    // Aspect ratio control
+    document.getElementById('aspectRatio').addEventListener('change', function() {
+        const value = this.value;
+        cropper.setAspectRatio(eval(value)); // Using eval to handle fractions like 16/9
+    });
+    
+    // Quality control
+    document.getElementById('qualityRange').addEventListener('input', function() {
+        currentQuality = parseFloat(this.value);
+    });
+    
+    // Rotation and flip controls
     document.getElementById('rotateLeft').addEventListener('click', function() {
         cropper.rotate(-90);
     });
@@ -309,35 +484,69 @@ document.addEventListener('DOMContentLoaded', function() {
         cropper.rotate(90);
     });
     
+    document.getElementById('flipHorizontal').addEventListener('click', function() {
+        cropper.scaleX(-cropper.getData().scaleX || -1);
+    });
+    
+    document.getElementById('flipVertical').addEventListener('click', function() {
+        cropper.scaleY(-cropper.getData().scaleY || -1);
+    });
+    
     // Reset button
     document.getElementById('resetCrop').addEventListener('click', function() {
         cropper.reset();
+        document.getElementById('aspectRatio').value = 'NaN';
     });
     
     // Save Crop handler
     document.getElementById('saveCrop').addEventListener('click', function() {
-        const croppedCanvas = cropper.getCroppedCanvas();
-        const croppedImage = croppedCanvas.toDataURL('image/jpeg', 0.9);
+        const croppedCanvas = cropper.getCroppedCanvas({
+            minWidth: 256,
+            minHeight: 256,
+            maxWidth: 4096,
+            maxHeight: 4096,
+            fillColor: '#fff',
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high'
+        });
         
-        // Here you would typically send the image to your server
-        // For this example, we'll just update the thumbnail
+        if (!croppedCanvas) {
+            alert('Error creating cropped image');
+            return;
+        }
+        
+        const croppedImage = croppedCanvas.toDataURL('image/jpeg', currentQuality);
+        
+        // Update all thumbnails with this image
         updateThumbnail(currentImageSrc, croppedImage);
         
         // Close the modal
         bootstrap.Modal.getInstance(document.getElementById('imageCropperModal')).hide();
+        
+        // Show success toast
+        showToast('Image saved successfully', 'success');
     });
     
     // Download button
     document.getElementById('downloadCrop').addEventListener('click', function() {
         const croppedCanvas = cropper.getCroppedCanvas();
         
+        if (!croppedCanvas) {
+            alert('Error creating cropped image');
+            return;
+        }
+        
         // Create a temporary link
         const link = document.createElement('a');
-        link.download = 'cropped_' + currentFilename;
-        link.href = croppedCanvas.toDataURL('image/jpeg', 0.9);
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        link.download = `cropped_${timestamp}_${currentFilename}`;
+        link.href = croppedCanvas.toDataURL('image/jpeg', currentQuality);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        
+        // Show success toast
+        showToast('Image downloaded', 'success');
     });
     
     // Clean up cropper when modal closes
@@ -357,6 +566,52 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    
+    // Helper function to show toast notifications
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.style.zIndex = '1090';
+        
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        toast.addEventListener('hidden.bs.toast', function() {
+            toast.remove();
+        });
+    }
+    
+    // Thumbnail size slider functionality
+    const thumbSizeSlider = document.getElementById('thumbSizeSlider');
+    function updateThumbSize(size) {
+        document.querySelectorAll('.image-thumbnail.small').forEach(el => {
+            el.style.width = size + 'px';
+            el.style.height = size + 'px';
+        });
+        document.querySelectorAll('.image-thumbnail.large').forEach(el => {
+            el.style.width = Math.round(size * 16 / 9) + 'px';
+            el.style.height = Math.round(size * 9 / 16) + 'px';
+        });
+    }
+    thumbSizeSlider.addEventListener('input', function() {
+        updateThumbSize(this.value);
+    });
+    // Set initial size
+    updateThumbSize(thumbSizeSlider.value);
 });
 </script>
-{% endblock %}
+{%endblock %}
