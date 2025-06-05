@@ -4,14 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Base Template{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block styles %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% endblock %}
 </head>
 <body>
     
     {%block dashboard %}{% endblock %}
 
     <main>
-        {% block main_content %}{% endblock %}
+        {% block content %}{% endblock %}
     </main>
 </body>
 </html>

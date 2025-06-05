@@ -1,4 +1,10 @@
-{% extends "home.html" %}
+{% extends "base.html" %}
+
+{% block title %}Image Gallery{% endblock title %}
+
+{% block dashboard %}
+    {% include "dashboard.html" %}
+{% endblock dashboard %}
 
 {% block styles %}
 
@@ -198,9 +204,9 @@
     }
 </style>
 
-{% endblock %}
+{% endblock styles %}
 
-{% block main_content %}
+{% block content %}
 <div class="gallery-container">
     <!-- Enhanced Header with Search -->
     <div class="gallery-header">
@@ -375,9 +381,8 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
+
 {{ super() }}
 <!-- Include Cropper.js -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
@@ -614,4 +619,6 @@ document.addEventListener('DOMContentLoaded', function() {
     updateThumbSize(thumbSizeSlider.value);
 });
 </script>
-{%endblock %}
+
+{% endblock content %}
+
