@@ -1,130 +1,191 @@
+{% extends "base.html" %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Expandable Dashboard</title>
+    <title>Enhanced Expandable Dashboard</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
-        body {
-            background-color: #e4e4e4e5;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            --primary-blue: #2563eb;
+            --hover-blue: #3b82f6;
+            --active-blue: #1d4ed8;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f3f4f6;
+            --sidebar-width-collapsed: 75px;
+            --sidebar-width-expanded: 250px;
         }
+        
+        body {
+            background-color: var(--bg-light);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
         .sidebar {
             height: 100vh;
-            width: 80px;
+            width: var(--sidebar-width-collapsed);
             background-color: #ffffff;
-            padding-top: 20px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            padding-top: 15px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: fixed;
             overflow-x: hidden;
+            z-index: 1000;
+
         }
+        
         .sidebar.expanded {
-            width: 250px;
+            width: var(--sidebar-width-expanded);
         }
+        
         .menu-toggle {
             display: flex;
             justify-content: flex-end;
-            padding: 10px 15px;
+            padding: 12px 15px;
             cursor: pointer;
+            margin-bottom: 10px;
         }
+        
+        .menu-toggle i {
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar.expanded .menu-toggle i {
+            transform: rotate(180deg);
+        }
+        
         .sidebar-item {
-            height: 50px;
-            margin: 5px 10px;
+            height: 48px;
+            margin: 4px 8px;
             display: flex;
             align-items: center;
-            padding: 0 15px;
-            border-radius: 8px;
-            transition: all 0.3s;
+            padding: 0 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
             white-space: nowrap;
             overflow: hidden;
         }
         
         .sidebar-item:hover {
-            background-color: #b9bcc0;
-            color:#ffffff;
-            cursor:pointer;
-
+            background-color: #e0e7ff;
+            cursor: pointer;
         }
+        
+        .sidebar-item:hover i {
+            color: var(--hover-blue);
+        }
+        
         .sidebar-item i {
-            font-size: 1.4rem;
-            color: #287af5; /* Darker blue */
-            margin-right: 20px;
-            width: 24px;
+            font-size: 1.3rem;
+            color: var(--primary-blue);
+            margin-right: 16px;
+            min-width: 24px;
             text-align: center;
-            font-weight: bold; /* Thicker icons */
+            transition: all 0.2s ease;
         }
+        
         .sidebar-item span {
-            font-size: 0.95rem;
-            color: #110101;
+            font-size: 0.92rem;
+            color: var(--text-dark);
             opacity: 0;
-            transition: opacity 0.2s ease;
+            transition: opacity 0.15s ease 0.1s;
+            font-weight: 500;
         }
+        
         .sidebar.expanded .sidebar-item span {
             opacity: 1;
         }
+        
         .sidebar-item.active {
-            background-color: #4d8ff1;
+            background-color: #2563eb;
         }
-
+        
         .sidebar-item.active i {
-            color: #ffffff;
+            color: white;
         }
-
+        
         .sidebar-item.active span {
-            font-weight: 500;
-            color: #0a0008;
+            color: white;
+            font-weight: 600;
         }
+        
         .main-content {
-            padding: 20px;
-            margin-left: 80px;
+            padding: 25px 30px;
+            margin-left: var(--sidebar-width-collapsed);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 100vh;
+        }
+        
+        .main-content.expanded {
+            margin-left: var(--sidebar-width-expanded);
+        }
+        
+        .divider {
+            height: 1px;
+            background-color: #e5e7eb;
+            margin: 12px 15px;
             transition: all 0.3s ease;
         }
-        .main-content.expanded {
-            margin-left: 250px;
+        
+        .sidebar.expanded .divider {
+            margin: 12px 15px;
         }
-
     </style>
 </head>
+
 <body>
     <div class="d-flex">
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
             <div class="menu-toggle" onclick="toggleSidebar()">
-                <i class="bi bi-list" style="font-size: 1.5rem; color: #0074FF;"></i>
+                <i class="bi bi-chevron-double-right" style="font-size: 1.2rem; color: var(--primary-blue);"></i>
             </div>
+            
             <div class="sidebar-item active">
                 <i class="bi bi-house-door"></i>
                 <span>Home</span>
             </div>
+            
             <div class="sidebar-item">
                 <i class="bi bi-speedometer2"></i>
                 <span>Dashboard</span>
             </div>
+            
+            <div class="divider"></div>
+            
             <div class="sidebar-item">
                 <i class="bi bi-cart"></i>
                 <span>Orders</span>
             </div>
+            
             <div class="sidebar-item">
                 <i class="bi bi-box-seam"></i>
                 <span>Products</span>
             </div>
-            <div class="sidebar-item">
-                <i class="bi bi-sliders"></i>
-                <span>Customize</span>
-            </div>
+            
             <div class="sidebar-item">
                 <i class="bi bi-people"></i>
                 <span>Customers</span>
             </div>
+            
+            <div class="divider"></div>
+            
+            <div class="sidebar-item">
+                <i class="bi bi-sliders"></i>
+                <span>Customize</span>
+            </div>
+            
             <div class="sidebar-item">
                 <i class="bi bi-graph-up"></i>
                 <span>Analytics</span>
             </div>
+            
             <div class="sidebar-item">
                 <i class="bi bi-gear"></i>
                 <span>Settings</span>
@@ -133,12 +194,13 @@
 
         <!-- Main content -->
         <div class="main-content" id="main-content">
-
-            {% block dashboard %}
-            <h2>Dashboard Overview</h2>
-            <p>Welcome to your dashboard. Click the menu icon to expand the sidebar.</p>
+            <h2 class="mb-4" style="color: var(--text-dark); font-weight: 600;">Dashboard Overview</h2>
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <p class="mb-0 text-muted">Welcome to your enhanced dashboard. Click the arrow icon to toggle the sidebar.</p>
+                </div>
+            </div>
             <!-- Your dashboard content goes here -->
-            {% endblock dashboard %}
         </div>
     </div>
 
@@ -151,6 +213,10 @@
             const mainContent = document.getElementById('main-content');
             sidebar.classList.toggle('expanded');
             mainContent.classList.toggle('expanded');
+            
+            // Store state in localStorage
+            const isExpanded = sidebar.classList.contains('expanded');
+            localStorage.setItem('sidebarExpanded', isExpanded);
         }
         
         // Add click event to menu items
@@ -161,6 +227,15 @@
                 });
                 this.classList.add('active');
             });
+        });
+        
+        // Check localStorage for saved state
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedState = localStorage.getItem('sidebarExpanded');
+            if (savedState === 'true') {
+                document.getElementById('sidebar').classList.add('expanded');
+                document.getElementById('main-content').classList.add('expanded');
+            }
         });
     </script>
 </body>
