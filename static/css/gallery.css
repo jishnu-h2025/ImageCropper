@@ -1,0 +1,192 @@
+/* Modern Gallery Styles */
+.gallery-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.gallery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.view-options .btn {
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.view-options .btn.active {
+    background-color: #0d6efd;
+    color: white;
+}
+/* Enhanced Thumbnail Styles */
+.image-thumbnail {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    background-color: #f8f9fa;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.image-thumbnail:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+}
+
+.image-thumbnail img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
+
+/* View Sizes */
+.small {
+    aspect-ratio: 1;
+    height: auto;
+}
+
+.large {
+    aspect-ratio: 4/3;
+    height: auto;
+}
+
+.image-thumbnail.small {
+    width: 180px;
+    height: 180px;
+    margin: 0 auto;
+}
+.image-thumbnail.large {
+    width: 320px;
+    height: 240px;
+    margin: 0 auto;
+}
+
+/* List View Enhancements */
+.list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.list-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.list-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.list-thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 1.5rem;
+}
+
+.list-details {
+    flex-grow: 1;
+}
+
+.list-filename {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #212529;
+}
+
+.list-mimetype {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* Overlay Effects */
+.image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    color: white;
+    padding: 1rem;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 40%;
+}
+
+.image-thumbnail:hover .image-overlay {
+    opacity: 1;
+}
+
+/* Enhanced Cropper Modal */
+.cropper-modal .modal-dialog {
+    max-width: 90%;
+    margin: 1rem auto;
+}
+
+.cropper-container {
+    max-height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cropper-buttons {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.cropper-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Size Slider */
+.thumb-size-slider {
+    width: 220px;
+    margin-left: 2rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .gallery-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .list-thumb {
+        width: 60px;
+        height: 60px;
+        margin-right: 1rem;
+    }
+}
+

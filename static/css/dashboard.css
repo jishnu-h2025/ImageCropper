@@ -1,0 +1,126 @@
+ 
+:root {
+    --primary-blue: #2563eb;
+    --hover-blue: #3b82f6;
+    --active-blue: #1d4ed8;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --bg-light: #f3f4f6;
+    --sidebar-width-collapsed: 75px;
+    --sidebar-width-expanded: 250px;
+}
+
+body {
+    background-color: var(--bg-light);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.sidebar {
+    height: 100vh;
+    width: var(--sidebar-width-collapsed);
+    background-color: #ffffff;
+    padding-top: 15px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: fixed;
+    overflow-x: hidden;
+    z-index: 1000;
+
+}
+
+.sidebar.expanded {
+    width: var(--sidebar-width-expanded);
+}
+
+.menu-toggle {
+    display: flex;
+    justify-content: flex-end;
+    padding: 12px 15px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.menu-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.sidebar.expanded .menu-toggle i {
+    transform: rotate(180deg);
+}
+
+.sidebar-item {
+    height: 48px;
+    margin: 4px 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sidebar-item:hover {
+    background-color: #e0e7ff;
+    cursor: pointer;
+}
+
+.sidebar-item:hover i {
+    color: var(--hover-blue);
+}
+
+.sidebar-item i {
+    font-size: 1.3rem;
+    color: var(--primary-blue);
+    margin-right: 16px;
+    min-width: 24px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.sidebar-item span {
+    font-size: 0.92rem;
+    color: var(--text-dark);
+    opacity: 0;
+    transition: opacity 0.15s ease 0.1s;
+    font-weight: 500;
+}
+
+.sidebar.expanded .sidebar-item span {
+    opacity: 1;
+}
+
+.sidebar-item.active {
+    background-color: #2563eb;
+}
+
+.sidebar-item.active i {
+    color: white;
+}
+
+.sidebar-item.active span {
+    color: white;
+    font-weight: 600;
+}
+
+.main-content {
+    padding: 25px 30px;
+    margin-left: var(--sidebar-width-collapsed);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 100vh;
+}
+
+.main-content.expanded {
+    margin-left: var(--sidebar-width-expanded);
+}
+
+.divider {
+    height: 1px;
+    background-color: #e5e7eb;
+    margin: 12px 15px;
+    transition: all 0.3s ease;
+}
+
+.sidebar.expanded .divider {
+    margin: 12px 15px;
+}
